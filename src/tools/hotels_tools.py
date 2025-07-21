@@ -1,12 +1,9 @@
 from langchain_core.tools import tool 
 from dotenv import load_dotenv 
 from typing import Optional, Dict , List  , Any
-import sys
 from pydantic import BaseModel , Field 
-
-sys.path.append("../../")  # set the path to root
 import requests
-from utils.help import get_amadeus_token
+from src.utils.help import get_amadeus_token
 
 
 load_dotenv()

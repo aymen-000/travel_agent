@@ -1,37 +1,45 @@
 from langchain_core.tools import tool
 from typing import Optional, Dict
-import sys
-
-sys.path.append("../../")  # set the path to root
 import requests
 from dotenv import load_dotenv
-from utils.help import get_amadeus_token
+from src.utils.help import get_amadeus_token
 
 load_dotenv()
 
 
 @tool
 def search_flight(
-    originLocationCode: str,
-    destinationLocationCode: str,
-    departureDate: str,
-    returnDate: Optional[str] = None,
+    originLocationCode: str,  # e.g., "ALG"
+    destinationLocationCode: str,  # e.g., "IST"
+    departureDate: str,  # format: YYYY-MM-DD
+    returnDate: Optional[str] = None,  # optional return date
     adults: int = 1,
-    travelClass: Optional[str] = None,
+    travelClass: Optional[str] = None  # e.g., ECONOMY, BUSINESS
 ) -> str:
-    """Searches for available flights between two cities using the Amadeus API.
-    Returns flight number, airline, stops, duration, and price."""
-
+    """
+    Search for available flights between two cities using the Amadeus API.
+    
+    Required:
+    - originLocationCode: The IATA code of the departure airport.
+    - destinationLocationCode: The IATA code of the arrival airport.
+    - departureDate: The date of departure (YYYY-MM-DD).
+    
+    Optional:
+    - returnDate: The return date for round trip (YYYY-MM-DD).
+    - adults: Number of adult passengers.
+    - travelClass: Desired travel class (ECONOMY, BUSINESS, FIRST).
+    
+    Returns:
+    Top 3 available flight options with price, time, stops, and airline info.
+    """
     token = get_amadeus_token()
     url = "https://test.api.amadeus.com/v2/shopping/flight-offers"
-
     params: Dict[str, str | int | float] = {
         "originLocationCode": originLocationCode,
         "destinationLocationCode": destinationLocationCode,
         "departureDate": departureDate,
         "adults": adults,
     }
-
     if returnDate:
         params["returnDate"] = returnDate
     if travelClass:
@@ -56,11 +64,9 @@ def search_flight(
         stops = len(segments) - 1
         price = offer["price"]["total"]
         currency = offer["price"]["currency"]
-
         flight_numbers = ", ".join(
             f"{seg['carrierCode']}{seg['number']}" for seg in segments
         )
-
         results.append(
             f"Flight {i}:\n"
             f"• Flight Number(s): {flight_numbers}\n"
@@ -77,21 +83,27 @@ def search_flight(
 
 @tool
 def get_nearby_airports(
-    latitude: float, longitude: float, radius: Optional[int] = 100
+    latitude: float,
+    longitude: float,
+    radius: Optional[int] = 100
 ) -> str:
     """
-    Finds nearby airports using latitude and longitude. Radius is in kilometers (default: 100km).
-    Returns a list of airport IATA codes and names.
+    Find airports near a given location (based on latitude and longitude).
+    
+    Required:
+    - latitude: Latitude coordinate.
+    - longitude: Longitude coordinate.
+    
+    Optional:
+    - radius: Search radius in kilometers (default is 100km).
+    
+    Returns:
+    A list of nearby airport IATA codes, names, and distance.
     """
-
     token = get_amadeus_token()
     url = "https://test.api.amadeus.com/v1/reference-data/locations/airports"
     headers = {"Authorization": f"Bearer {token}"}
-    params: Dict[str, str | int | float | None] = {
-        "latitude": latitude,
-        "longitude": longitude,
-        "radius": radius,
-    }
+    params = {"latitude": latitude, "longitude": longitude, "radius": radius}
 
     response = requests.get(url, headers=headers, params=params)
     response.raise_for_status()
@@ -113,11 +125,20 @@ def get_nearby_airports(
 
 @tool
 def get_airport_name_from_iata(iata_code: str) -> str:
-    """Returns full airport name and location from IATA code."""
+    """
+    Retrieve airport name and location using its IATA code.
+    
+    Required:
+    - iata_code: 3-letter IATA airport code (e.g., CDG, JFK).
+    
+    Returns:
+    Full airport name and location (city and country).
+    """
     token = get_amadeus_token()
     url = "https://test.api.amadeus.com/v1/reference-data/locations"
-    params: Dict[str, str] = {"keyword": iata_code, "subType": "AIRPORT"}
+    params = {"keyword": iata_code, "subType": "AIRPORT"}
     headers = {"Authorization": f"Bearer {token}"}
+
     response = requests.get(url, headers=headers, params=params)
     response.raise_for_status()
     data = response.json()
@@ -134,11 +155,20 @@ def get_airport_name_from_iata(iata_code: str) -> str:
 
 @tool
 def check_flight_status(flight_number: str, scheduled_date: str) -> str:
-    """Returns scheduled flight status from flight number and date (YYYY-MM-DD)."""
+    """
+    Check the status of a specific flight on a given date.
+    
+    Required:
+    - flight_number: Airline + flight number (e.g., TK652).
+    - scheduled_date: Date in YYYY-MM-DD format.
+    
+    Returns:
+    Flight's departure and arrival details.
+    """
     token = get_amadeus_token()
     url = "https://test.api.amadeus.com/v2/schedule/flights"
     headers = {"Authorization": f"Bearer {token}"}
-    params: Dict[str, str] = {
+    params = {
         "carrierCode": flight_number[:2],
         "flightNumber": flight_number[2:],
         "scheduledDepartureDate": scheduled_date,
@@ -159,54 +189,49 @@ def check_flight_status(flight_number: str, scheduled_date: str) -> str:
         if len(flight_points) < 2:
             continue
 
-        dep_point = flight_points[0]
-        arr_point = flight_points[1]
+        dep = flight_points[0]
+        arr = flight_points[1]
 
-        dep_code = dep_point.get("iataCode", "Unknown")
-        arr_code = arr_point.get("iataCode", "Unknown")
+        dep_code = dep.get("iataCode", "Unknown")
+        arr_code = arr.get("iataCode", "Unknown")
 
-        dep_time = (
-            dep_point.get("departure", {})
-            .get("timings", [{}])[0]
-            .get("value", "Unknown")
-        )
-        arr_time = (
-            arr_point.get("arrival", {}).get("timings", [{}])[0].get("value", "Unknown")
-        )
+        dep_time = dep.get("departure", {}).get("timings", [{}])[0].get("value", "Unknown")
+        arr_time = arr.get("arrival", {}).get("timings", [{}])[0].get("value", "Unknown")
 
         result.append(
             f"Flight {flight_number} on {scheduled_date}:\n"
-            f"Departure: {dep_code} at {dep_time}\n"
-            f"Arrival: {arr_code} at {arr_time}"
+            f"• Departure: {dep_code} at {dep_time}\n"
+            f"• Arrival: {arr_code} at {arr_time}"
         )
 
-    return (
-        "\n".join(result)
-        if result
-        else f"Incomplete flight data for {flight_number} on {scheduled_date}."
-    )
+    return "\n".join(result) if result else f"Incomplete data for {flight_number}."
 
 
 @tool
 def get_checkin_links(airline_code: str) -> str:
-    """Returns the check-in links for a specific airline using its IATA code (e.g., 'LH', 'AF')."""
+    """
+    Get the official check-in URL for a specific airline.
+    
+    Required:
+    - airline_code: 2-letter airline IATA code (e.g., TK, AF).
+    
+    Returns:
+    Direct link to the airline's check-in page.
+    """
     token = get_amadeus_token()
     url = "https://test.api.amadeus.com/v2/reference-data/urls/checkin-links"
     headers = {"Authorization": f"Bearer {token}"}
-    params: Dict[str, str] = {"airlineCode": airline_code}
+    params = {"airlineCode": airline_code}
 
     try:
         response = requests.get(url, headers=headers, params=params)
         response.raise_for_status()
         data = response.json()
 
-        if not data.get("data") or len(data["data"]) == 0:
-            return f"No check-in link provided for airline: {airline_code.upper()}"
+        if not data.get("data"):
+            return f"No check-in link found for airline: {airline_code.upper()}"
 
-        return data["data"][0].get(
-            "href", f"No check-in link available for {airline_code.upper()}"
-        )
-
+        return data["data"][0].get("href", f"No link available for {airline_code.upper()}")
     except requests.exceptions.RequestException as e:
         return f"Error fetching check-in link: {str(e)}"
 
@@ -221,13 +246,24 @@ def book_flight_manually(
     travelClass: Optional[str] = None,
 ) -> str:
     """
-    This tool cannot book flights, but it returns flight info to help users book manually.
+    This tool provides flight details for manual booking (not real-time booking).
+    
+    Required:
+    - originLocationCode: IATA code of departure airport.
+    - destinationLocationCode: IATA code of destination airport.
+    - departureDate: Flight departure date.
+    
+    Optional:
+    - returnDate: Return trip date.
+    - adults: Number of passengers.
+    - travelClass: ECONOMY, BUSINESS, etc.
+    
+    Returns:
+    A single recommended flight with info for manual booking.
     """
-
     token = get_amadeus_token()
     url = "https://test.api.amadeus.com/v2/shopping/flight-offers"
-
-    params: Dict[str, str | int] = {
+    params = {
         "originLocationCode": originLocationCode,
         "destinationLocationCode": destinationLocationCode,
         "departureDate": departureDate,
@@ -247,7 +283,7 @@ def book_flight_manually(
     if not data.get("data"):
         return "No flights found for the given criteria."
 
-    offer = data["data"][0]  # Just take the first one
+    offer = data["data"][0]
     itinerary = offer["itineraries"][0]
     segments = itinerary["segments"]
     departure = segments[0]["departure"]

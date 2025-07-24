@@ -306,3 +306,58 @@ def book_flight_manually(
         f"• Stops: {stops}\n"
         f"• Price: {price} {currency}"
     )
+    
+from langchain_core.tools import tool
+import requests
+from typing import Optional
+from src.utils.help import get_amadeus_token
+
+@tool
+def get_checkin_links(
+    airlineCode: str,  # e.g., "BA", "AF", "1X"
+    language: Optional[str] = "en-GB"  # e.g., "EN", "en-GB"
+) -> str:
+    """
+    Get online check-in links (web and mobile) for a specific airline using its IATA or ICAO code.
+
+    Required:
+    - airlineCode: 2-letter or 3-letter airline code (e.g., BA, AF, TK).
+
+    Optional:
+    - language: Language code for the check-in page, e.g., "EN", "en-GB". Defaults to "en-GB".
+
+    Returns:
+    Direct check-in URLs (web & mobile) for the airline, or an appropriate message if unavailable.
+    """
+    token = get_amadeus_token()
+    url = "https://test.api.amadeus.com/v2/reference-data/urls/checkin-links"
+    headers = {"Authorization": f"Bearer {token}"}
+    params = {
+        "airlineCode": airlineCode,
+        "language": language
+    }
+
+    try:
+        response = requests.get(url, headers=headers, params=params)
+        response.raise_for_status()
+        data = response.json()
+
+        if not data.get("data"):
+            return f"No check-in links found for airline: {airlineCode.upper()}"
+
+        links = []
+        for entry in data["data"]:
+            channel = entry.get("channel", "Unknown")
+            href = entry.get("href", "No URL")
+            links.append(f"• {channel} Check-in: {href}")
+
+        return f"✈️ Online Check-in Links for {airlineCode.upper()}:\n" + "\n".join(links)
+
+    except requests.exceptions.RequestException as e:
+        return f"❌ Error fetching check-in link: {str(e)}"
+
+
+
+result = get_checkin_links.invoke({"airlineCode" : "BA", "language" :"EN"})
+
+

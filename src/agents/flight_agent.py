@@ -14,14 +14,7 @@ from langgraph.prebuilt import tools_condition, ToolNode
 
 from langchain_together import ChatTogether
 from src.prompts.agents_prompts import FLIGHT_AGENT_PROMPT
-from src.tools.search_flights import (
-    search_flight,
-    check_flight_status,
-    get_checkin_links,
-    get_airport_name_from_iata,
-    get_nearby_airports,
-    book_flight_manually,
-)
+from src.tools.search_flights import get_airport_name_from_iata , get_nearby_airports ,search_flight , book_flight_manually,get_checkin_links,check_flight_status 
 from src.utils.help import *
 
 
@@ -31,12 +24,7 @@ model_id = os.environ.get("FLIGHT_AGENT_MODEL_ID")
 
 # Define tools
 tools = [
-    search_flight,
-    check_flight_status,
-    get_checkin_links,
-    get_airport_name_from_iata,
-    get_nearby_airports,
-    book_flight_manually,
+    get_airport_name_from_iata , get_nearby_airports ,search_flight , book_flight_manually,get_checkin_links,check_flight_status
 ]
 
 # Define state

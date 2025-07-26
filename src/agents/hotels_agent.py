@@ -13,29 +13,25 @@ from langgraph.graph.message import add_messages
 from langgraph.prebuilt import tools_condition, ToolNode
 
 from langchain_together import ChatTogether
-from src.prompts.agents_prompts import FLIGHT_AGENT_PROMPT
-from src.tools.search_flights import get_airport_name_from_iata , get_nearby_airports ,search_flight , book_flight_manually,get_checkin_links,check_flight_status 
+from src.prompts.agents_prompts import HOTEL_AGENT_PROMPT
+from src.tools.hotels_tools import get_hotel_offers ,search_hotels , tavily_search_tool
 from src.utils.help import *
-
-
-# Load environment
+ 
 load_dotenv()
-model_id = os.environ.get("FLIGHT_AGENT_MODEL_ID")
+model_id = os.environ.get("HOTEL_AGENT_MODEL_ID")
 
-# Define tools
 tools = [
-    get_airport_name_from_iata , get_nearby_airports ,search_flight , book_flight_manually,get_checkin_links,check_flight_status
+    get_hotel_offers ,search_hotels , tavily_search_tool
 ]
+ 
 
-# Define state
+ # Define state
 class State(TypedDict):
     messages: Annotated[list[AnyMessage], add_messages]
 
 # LLM
 llm = ChatTogether(model=model_id, temperature=1)
-assistant_runnable = FLIGHT_AGENT_PROMPT | llm.bind_tools(tools)
-
-
+assistant_runnable = HOTEL_AGENT_PROMPT | llm.bind_tools(tools)
 
 
 class Assistant:
@@ -57,27 +53,29 @@ class Assistant:
                 break
 
         return {"messages": [results]}
-
+    
+    
+    
 
 # Build the LangGraph
-flight_builder = StateGraph(State)
-flight_builder.add_node("assistant", Assistant(assistant_runnable))
-flight_builder.add_node("tools", create_tool_node_with_fallback(tools))
+hotel_builder = StateGraph(State)
+hotel_builder.add_node("assistant", Assistant(assistant_runnable))
+hotel_builder.add_node("tools", create_tool_node_with_fallback(tools))
 
-flight_builder.add_edge(START, "assistant")
+hotel_builder.add_edge(START, "assistant")
 
 # Direct based on whether tools were requested
-flight_builder.add_conditional_edges(
+hotel_builder.add_conditional_edges(
     "assistant",
     tools_condition, 
 )
 
-flight_builder.add_edge("tools", "assistant")
-flight_builder.set_finish_point("assistant")
+hotel_builder.add_edge("tools", "assistant")
+hotel_builder.set_finish_point("assistant")
 
 # Compile graph
 memory = InMemorySaver()
-part_1_graph = flight_builder.compile(checkpointer=memory)
+part_1_graph = hotel_builder.compile(checkpointer=memory)
 
 # Runtime loop
 thread_id = str(uuid.uuid4())
@@ -87,9 +85,8 @@ config = {
     }
 }
 
-""" _printed = set()
-print("🛫 Welcome to the Flight Agent! Type 'quit' to exit.\n")
-
+print("🛫 Welcome to the Hotel Agent! Type 'quit' to exit.\n")
+_printed = set()
 while True:
     user_input = input("user: > ")
     if user_input.lower() == "quit":
@@ -104,5 +101,10 @@ while True:
 
     for event in events:
         print(event)
-        print_event(event, _printed)
- """
+        print_event(event, _printed) 
+        
+        
+
+
+ 
+ 

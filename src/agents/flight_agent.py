@@ -11,7 +11,7 @@ from langgraph.graph import StateGraph, START, END
 from langgraph.checkpoint.memory import InMemorySaver
 from langgraph.graph.message import add_messages
 from langgraph.prebuilt import tools_condition, ToolNode
-
+from langgraph.types import Command
 from langchain_together import ChatTogether
 from src.prompts.agents_prompts import FLIGHT_AGENT_PROMPT
 from src.tools.search_flights import get_airport_name_from_iata , get_nearby_airports ,search_flight , book_flight_manually,get_checkin_links,check_flight_status 
@@ -77,7 +77,7 @@ flight_builder.set_finish_point("assistant")
 
 # Compile graph
 memory = InMemorySaver()
-part_1_graph = flight_builder.compile(checkpointer=memory)
+flight_graph = flight_builder.compile(checkpointer=memory)
 
 # Runtime loop
 thread_id = str(uuid.uuid4())
@@ -86,6 +86,18 @@ config = {
         "thread_id": thread_id
     }
 }
+
+
+def flight_node(state:State) : 
+    results = flight_graph.invoke(state ) 
+    return Command(
+        update={
+            "messages" : state["messages"] + [
+                AIMessage(content=results["messages"][-1].content , name="flight_node")
+            ]
+        } , 
+        goto="supervisor"
+    )
 
 """ _printed = set()
 print("🛫 Welcome to the Flight Agent! Type 'quit' to exit.\n")

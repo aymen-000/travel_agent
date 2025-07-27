@@ -1041,6 +1041,19 @@ wheels = [
 ]
 
 [[package]]
+name = "langgraph-supervisor"
+version = "0.0.28"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "langchain-core" },
+    { name = "langgraph" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/e1/68/22a491f4ad72c75c77014219073c77bf580892a75934488e7543b730bdde/langgraph_supervisor-0.0.28.tar.gz", hash = "sha256:58af7c66fd184bf8adaff14ea31270ba576ae0b6809537a74b9fa6cc217b28e3", size = 20968, upload-time = "2025-07-23T14:22:23.025Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/43/7c/434c06894f8585e7d869dbefdcfc80ec446ff5edde1844085c611dfa896b/langgraph_supervisor-0.0.28-py3-none-any.whl", hash = "sha256:4daaeef17dadf2fe701b7d8ff1b76623dafd80a0a605870c163f67a18f30641e", size = 15925, upload-time = "2025-07-23T14:22:21.902Z" },
+]
+
+[[package]]
 name = "langsmith"
 version = "0.3.45"
 source = { registry = "https://pypi.org/simple" }
@@ -2492,6 +2505,7 @@ dependencies = [
     { name = "langchain-core" },
     { name = "langchain-tavily" },
     { name = "langgraph" },
+    { name = "langgraph-supervisor" },
     { name = "openai" },
     { name = "pydantic" },
     { name = "pydantic-settings" },
@@ -2531,6 +2545,7 @@ requires-dist = [
     { name = "langchain-core", specifier = ">=0.2.0" },
     { name = "langchain-tavily", specifier = ">=0.2.11" },
     { name = "langgraph", specifier = ">=0.2.0" },
+    { name = "langgraph-supervisor", specifier = ">=0.0.28" },
     { name = "openai", specifier = ">=1.40.0" },
     { name = "pydantic", specifier = ">=2.0.0" },
     { name = "pydantic-settings", specifier = ">=2.0.0" },

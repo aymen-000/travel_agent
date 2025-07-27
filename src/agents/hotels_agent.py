@@ -11,12 +11,13 @@ from langgraph.graph import StateGraph, START, END
 from langgraph.checkpoint.memory import InMemorySaver
 from langgraph.graph.message import add_messages
 from langgraph.prebuilt import tools_condition, ToolNode
-
+from langgraph.types import Command
 from langchain_together import ChatTogether
 from src.prompts.agents_prompts import HOTEL_AGENT_PROMPT
 from src.tools.hotels_tools import get_hotel_offers ,search_hotels , tavily_search_tool
 from src.utils.help import *
  
+
 load_dotenv()
 model_id = os.environ.get("HOTEL_AGENT_MODEL_ID")
 
@@ -75,33 +76,38 @@ hotel_builder.set_finish_point("assistant")
 
 # Compile graph
 memory = InMemorySaver()
-part_1_graph = hotel_builder.compile(checkpointer=memory)
+hotel_graph = hotel_builder.compile(checkpointer=memory)
 
-# Runtime loop
-thread_id = str(uuid.uuid4())
-config = {
-    "configurable": {
-        "thread_id": thread_id
-    }
-}
 
-print("🛫 Welcome to the Hotel Agent! Type 'quit' to exit.\n")
-_printed = set()
-while True:
-    user_input = input("user: > ")
-    if user_input.lower() == "quit":
-        print("Session ended.")
-        break
-
-    events = part_1_graph.stream(
-        {"messages": [HumanMessage(content=user_input)]},
-        config=config,
-        stream_mode="values"
+def hotel_node(state:State) : 
+    results = hotel_graph.invoke(state) 
+    return Command(
+        update={
+            "messages" : state["messages"] + [
+                AIMessage(content=results["messages"][-1].content , name="hotel_node")
+            ]
+        } , 
+        goto="supervisor"
     )
 
-    for event in events:
-        print(event)
-        print_event(event, _printed) 
+
+# print("🛫 Welcome to the Hotel Agent! Type 'quit' to exit.\n")
+# _printed = set()
+# while True:
+#     user_input = input("user: > ")
+#     if user_input.lower() == "quit":
+#         print("Session ended.")
+#         break
+
+#     events = part_1_graph.stream(
+#         {"messages": [HumanMessage(content=user_input)]},
+#         config=config,
+#         stream_mode="values"
+#     )
+
+#     for event in events:
+#         print(event)
+#         print_event(event, _printed) 
         
         
 

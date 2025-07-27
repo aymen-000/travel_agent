@@ -69,6 +69,8 @@ def print_event(event: dict, _printed: set):
     if current_state:
         print("Currently in: ", current_state[-1])
     message = event.get("messages")
+    reasoning = event.get("reasoning")
+    print(reasoning)
     if message:
         if isinstance(message, list):
             message = message[-1]

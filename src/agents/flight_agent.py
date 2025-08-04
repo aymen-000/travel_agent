@@ -16,8 +16,8 @@ from langchain_together import ChatTogether
 from src.prompts.agents_prompts import FLIGHT_AGENT_PROMPT
 from src.tools.search_flights import get_airport_name_from_iata , get_nearby_airports ,search_flight , book_flight_manually,get_checkin_links,check_flight_status 
 from src.utils.help import *
-
-
+from langchain_groq import ChatGroq
+from src.utils.help import ChatOpenRouter
 # Load environment
 load_dotenv()
 model_id = os.environ.get("FLIGHT_AGENT_MODEL_ID")
@@ -32,7 +32,7 @@ class State(TypedDict):
     messages: Annotated[list[AnyMessage], add_messages]
 
 # LLM
-llm = ChatTogether(model=model_id, temperature=1)
+llm = ChatTogether(model_name=model_id , temperature=0.7)
 assistant_runnable = FLIGHT_AGENT_PROMPT | llm.bind_tools(tools)
 
 

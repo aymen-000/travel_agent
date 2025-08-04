@@ -20,6 +20,7 @@ dependencies = [
     "langchain>=0.2.0",
     "langchain-community>=0.2.0",
     "langchain-core>=0.2.0",
+    "langchain-groq>=0.3.2",
     "langchain-tavily>=0.2.11",
     "langgraph>=0.2.0",
     "langgraph-supervisor>=0.0.28",

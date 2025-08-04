@@ -16,8 +16,8 @@ from langchain_together import ChatTogether
 from src.prompts.agents_prompts import HOTEL_AGENT_PROMPT
 from src.tools.hotels_tools import get_hotel_offers ,search_hotels , tavily_search_tool
 from src.utils.help import *
- 
-
+from langchain_groq import ChatGroq
+from src.utils.help import ChatOpenRouter
 load_dotenv()
 model_id = os.environ.get("HOTEL_AGENT_MODEL_ID")
 
@@ -31,7 +31,7 @@ class State(TypedDict):
     messages: Annotated[list[AnyMessage], add_messages]
 
 # LLM
-llm = ChatTogether(model=model_id, temperature=1)
+llm = ChatTogether(model_name=model_id , temperature=0.8)
 assistant_runnable = HOTEL_AGENT_PROMPT | llm.bind_tools(tools)
 
 
@@ -90,24 +90,29 @@ def hotel_node(state:State) :
         goto="supervisor"
     )
 
+thread_id = str(uuid.uuid4())
+config = {
+    "configurable": {
+        "thread_id": thread_id
+    }
+}
+""" print("🛫 Welcome to the Hotel Agent! Type 'quit' to exit.\n")
+_printed = set()
+while True:
+     user_input = input("user: > ")
+     if user_input.lower() == "quit":
+         print("Session ended.")
+         break
 
-# print("🛫 Welcome to the Hotel Agent! Type 'quit' to exit.\n")
-# _printed = set()
-# while True:
-#     user_input = input("user: > ")
-#     if user_input.lower() == "quit":
-#         print("Session ended.")
-#         break
+     events = hotel_graph.stream(
+         {"messages": [HumanMessage(content=user_input)]},
+         config=config ,
+         stream_mode="values"
+     )
 
-#     events = part_1_graph.stream(
-#         {"messages": [HumanMessage(content=user_input)]},
-#         config=config,
-#         stream_mode="values"
-#     )
-
-#     for event in events:
-#         print(event)
-#         print_event(event, _printed) 
+     for event in events:
+         print(event)
+         print_event(event, _printed)  """
         
         
 

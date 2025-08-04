@@ -7,7 +7,12 @@ from langchain_core.messages import ToolMessage
 from langgraph.prebuilt import ToolNode
 from langchain_core.runnables.config import RunnableConfig
 from langchain_core.runnables import RunnableLambda
-
+from typing import Optional
+from langchain_core.utils.utils import secret_from_env
+from langchain_openai import ChatOpenAI
+from pydantic import Field, SecretStr
+from typing import Dict, Set, Any, List, Union
+from langchain_core.messages import BaseMessage 
 
 load_dotenv() 
 def get_amadeus_token() -> str:
@@ -64,13 +69,12 @@ def create_tool_node_with_fallback(tools : List) -> Dict :
     )
     
     
-def print_event(event: dict, _printed: set):
+
+def print_event(event: dict, _printed: set, max_length=1500):
     current_state = event.get("dialog_state")
     if current_state:
         print("Currently in: ", current_state[-1])
     message = event.get("messages")
-    reasoning = event.get("reasoning")
-    print(reasoning)
     if message:
         if isinstance(message, list):
             message = message[-1]
@@ -78,3 +82,21 @@ def print_event(event: dict, _printed: set):
             msg_repr = message.pretty_repr(html=True)
             print(msg_repr)
             _printed.add(message.id)
+            
+
+
+
+class ChatOpenRouter(ChatOpenAI):
+    openai_api_key: Optional[SecretStr] = Field(
+        alias="api_key", default_factory=secret_from_env("OPENROUTER_API_KEY", default=None)
+    )
+    @property
+    def lc_secrets(self) -> dict[str, str]:
+        return {"openai_api_key": "OPENROUTER_API_KEY"}
+
+    def __init__(self,
+                 openai_api_key: Optional[str] = None,
+                 **kwargs):
+        openai_api_key = openai_api_key or os.environ.get("OPENROUTER_API_KEY")
+        super().__init__(base_url="https://openrouter.ai/api/v1", openai_api_key=openai_api_key, **kwargs)
+

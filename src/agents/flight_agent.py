@@ -18,6 +18,7 @@ from src.tools.search_flights import get_airport_name_from_iata , get_nearby_air
 from src.utils.help import *
 from langchain_groq import ChatGroq
 from src.utils.help import ChatOpenRouter
+from agent_utils import State , Assistant
 # Load environment
 load_dotenv()
 model_id = os.environ.get("FLIGHT_AGENT_MODEL_ID")
@@ -27,37 +28,10 @@ tools = [
     get_airport_name_from_iata , get_nearby_airports ,search_flight , book_flight_manually,get_checkin_links,check_flight_status
 ]
 
-# Define state
-class State(TypedDict):
-    messages: Annotated[list[AnyMessage], add_messages]
 
 # LLM
 llm = ChatTogether(model_name=model_id , temperature=0.7)
 assistant_runnable = FLIGHT_AGENT_PROMPT | llm.bind_tools(tools)
-
-
-
-
-class Assistant:
-    def __init__(self, runnable: Runnable):
-        self.run = runnable
-
-    def __call__(self, state: State, config=RunnableConfig):
-        while True:
-            results = self.run.invoke(state)
-
-            # Check if assistant returned valid output
-            if not results.tool_calls and (
-                not results.content
-                or (isinstance(results.content, list) and not results.content[0].get("text"))
-            ):
-                message = state["messages"] + [HumanMessage(content="Respond with a real output")]
-                state = {**state, "messages": message}
-            else:
-                break
-
-        return {"messages": [results]}
-
 
 # Build the LangGraph
 flight_builder = StateGraph(State)

@@ -13,8 +13,8 @@ from langgraph.graph.message import add_messages
 from langgraph.prebuilt import tools_condition, ToolNode
 from langgraph.types import Command
 from langchain_together import ChatTogether
-from src.prompts.agents_prompts import HOTEL_AGENT_PROMPT
-from src.tools.hotels_tools import get_hotel_offers ,search_hotels , tavily_search_tool
+from src.prompts.agents_prompts import DIESTINATION_AGENT_PROMPT
+from src.tools.destination_tools import get_tours_and_activities , city_search_amadeus , tavily_search_tool ,get_city_coordinates  , get_user_location
 from src.utils.help import *
 from langchain_groq import ChatGroq
 from src.utils.help import ChatOpenRouter
@@ -23,46 +23,44 @@ load_dotenv()
 model_id = os.environ.get("HOTEL_AGENT_MODEL_ID")
 
 tools = [
-    get_hotel_offers ,search_hotels , tavily_search_tool
+    get_tours_and_activities , city_search_amadeus , tavily_search_tool ,get_city_coordinates , get_user_location
 ]
  
 
 # LLM
 llm = ChatTogether(model_name=model_id , temperature=0.8)
-assistant_runnable = HOTEL_AGENT_PROMPT | llm.bind_tools(tools)
+assistant_runnable = DIESTINATION_AGENT_PROMPT | llm.bind_tools(tools)
 
 
-    
-    
-    
 
 # Build the LangGraph
-hotel_builder = StateGraph(State)
-hotel_builder.add_node("assistant", Assistant(assistant_runnable))
-hotel_builder.add_node("tools", create_tool_node_with_fallback(tools))
+destination_builder = StateGraph(State)
+destination_builder.add_node("assistant", Assistant(assistant_runnable))
+destination_builder.add_node("tools", create_tool_node_with_fallback(tools))
 
-hotel_builder.add_edge(START, "assistant")
+destination_builder.add_edge(START, "assistant")
 
 # Direct based on whether tools were requested
-hotel_builder.add_conditional_edges(
+destination_builder.add_conditional_edges(
     "assistant",
     tools_condition, 
 )
 
-hotel_builder.add_edge("tools", "assistant")
-hotel_builder.set_finish_point("assistant")
+destination_builder.add_edge("tools", "assistant")
+destination_builder.set_finish_point("assistant")
 
 # Compile graph
 memory = InMemorySaver()
-hotel_graph = hotel_builder.compile(checkpointer=memory)
+destination_graph = destination_builder.compile(checkpointer=memory)
 
 
-def hotel_node(state:State) : 
-    results = hotel_graph.invoke(state) 
+def destination_node(state:State) : 
+    results = destination_graph.invoke(state) 
+    print(results)
     return Command(
         update={
             "messages" : state["messages"] + [
-                AIMessage(content=results["messages"][-1].content , name="hotel_node")
+                AIMessage(content=results["messages"][-1].content , name="destination_node")
             ]
         } , 
         goto="supervisor"
@@ -74,7 +72,7 @@ config = {
         "thread_id": thread_id
     }
 }
-""" print("🛫 Welcome to the Hotel Agent! Type 'quit' to exit.\n")
+""" print("🛫 Welcome to the Destination Agent! Type 'quit' to exit.\n")
 _printed = set()
 while True:
      user_input = input("user: > ")
@@ -82,7 +80,7 @@ while True:
          print("Session ended.")
          break
 
-     events = hotel_graph.stream(
+     events = destination_graph.stream(
          {"messages": [HumanMessage(content=user_input)]},
          config=config ,
          stream_mode="values"
@@ -90,8 +88,8 @@ while True:
 
      for event in events:
          print(event)
-         print_event(event, _printed)  """
-        
+         print_event(event, _printed) 
+         """
         
 
 

@@ -18,29 +18,25 @@ from src.tools.search_flights import get_airport_name_from_iata , get_nearby_air
 from src.utils.help import *
 from langchain_groq import ChatGroq
 from src.utils.help import ChatOpenRouter
-from agent_utils import State , Assistant
-# Load environment
+from src.agents.agent_utils import State , Assistant
 load_dotenv()
 model_id = os.environ.get("FLIGHT_AGENT_MODEL_ID")
 
-# Define tools
 tools = [
     get_airport_name_from_iata , get_nearby_airports ,search_flight , book_flight_manually,get_checkin_links,check_flight_status
 ]
 
 
-# LLM
-llm = ChatTogether(model_name=model_id , temperature=0.7)
+
+llm = ChatTogether(model_name=model_id , temperature=0.8 , max_tokens=8000)
 assistant_runnable = FLIGHT_AGENT_PROMPT | llm.bind_tools(tools)
 
-# Build the LangGraph
 flight_builder = StateGraph(State)
 flight_builder.add_node("assistant", Assistant(assistant_runnable))
 flight_builder.add_node("tools", create_tool_node_with_fallback(tools))
 
 flight_builder.add_edge(START, "assistant")
 
-# Direct based on whether tools were requested
 flight_builder.add_conditional_edges(
     "assistant",
     tools_condition, 
@@ -49,11 +45,9 @@ flight_builder.add_conditional_edges(
 flight_builder.add_edge("tools", "assistant")
 flight_builder.set_finish_point("assistant")
 
-# Compile graph
 memory = InMemorySaver()
 flight_graph = flight_builder.compile(checkpointer=memory)
 
-# Runtime loop
 thread_id = str(uuid.uuid4())
 config = {
     "configurable": {
@@ -73,22 +67,3 @@ def flight_node(state:State) :
         goto="supervisor"
     )
 
-""" _printed = set()
-print("🛫 Welcome to the Flight Agent! Type 'quit' to exit.\n")
-
-while True:
-    user_input = input("user: > ")
-    if user_input.lower() == "quit":
-        print("Session ended.")
-        break
-
-    events = part_1_graph.stream(
-        {"messages": [HumanMessage(content=user_input)]},
-        config=config,
-        stream_mode="values"
-    )
-
-    for event in events:
-        print(event)
-        print_event(event, _printed)
- """

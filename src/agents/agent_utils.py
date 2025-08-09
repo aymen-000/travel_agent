@@ -2,7 +2,6 @@ from typing import TypedDict  , Annotated
 from langchain_core.messages import HumanMessage , AnyMessage
 from langchain_core.runnables import Runnable  , RunnableConfig
 from langgraph.graph.message import add_messages 
-# Define state
 class State(TypedDict):
     messages: Annotated[list[AnyMessage], add_messages]
 

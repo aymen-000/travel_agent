@@ -8,7 +8,7 @@
 [![React](https://img.shields.io/badge/React-18.0+-61DAFB.svg)](https://reactjs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.0+-blue.svg)](https://www.typescriptlang.org/)
 
-![Demo Video Placeholder](/doc/demo.mkv)
+![Download Demo Video ](/doc/demo.mkv)
 
 ## 🎯 Project Overview
 

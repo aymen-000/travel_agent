@@ -199,7 +199,7 @@ We welcome contributions from the community! TravelMate AI thrives on collaborat
 
 1. **Fork the Repository**
    ```bash
-   git fork https://github.com/aymen-000/travelmate-ai.git
+   git fork https://github.com/aymen-000/travel_agent.git
    ```
 
 2. **Create a Feature Branch**
@@ -242,7 +242,7 @@ TravelMate AI represents a passion project combining artificial intelligence, tr
 
 ### Connect with Aimen
 - 🐙 GitHub: [@aymen-000](https://github.com/aymen-000)
-- 💼 LinkedIn: [Aimen's Profile]([https://linkedin.com/in/aimen-profile](https://www.linkedin.com/in/boukhari-aimen-5a64b9284/))
+- 💼 LinkedIn: [Profile]([https://linkedin.com/in/aimen-profile](https://www.linkedin.com/in/boukhari-aimen-5a64b9284/)
 
 
 ---

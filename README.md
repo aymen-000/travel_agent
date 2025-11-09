@@ -249,17 +249,7 @@ TravelMate AI represents a passion project combining artificial intelligence, tr
 
 ## 📜 License
 
-This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) file for details.
-
-```
-MIT License
-
-Copyright (c) 2025 Aimen
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction...
-```
+This project is licensed under the **MIT License**.
 
 ---
 

@@ -10,38 +10,38 @@
 
 ![Download Demo Video ](/doc/demo.mkv)
 
-## 🎯 Project Overview
+##  Project Overview
 
 **TravelMate AI** revolutionizes travel planning through an intelligent multi-agent system that understands, learns, and adapts to your travel needs. Built with cutting-edge AI technology, it seamlessly orchestrates flight bookings, hotel reservations, destination exploration, and comprehensive trip coordination through natural conversations.
 
-### 🏗️ Architecture Highlights
+###  Architecture Highlights
 
 Our sophisticated multi-agent architecture employs specialized AI agents, each mastering specific travel domains while collaborating intelligently to deliver unified, context-aware travel solutions.
 
 ---
 
-## ✨ Key Features
+##  Key Features
 
-### 🤖 **Intelligent Multi-Agent System**
+###  **Intelligent Multi-Agent System**
 - **Flight Agent**: Advanced flight search, price tracking, and booking assistance
 - **Hotel Agent**: Accommodation discovery with preference matching
 - **Destination Agent**: Local insights, attractions, and cultural recommendations
 - **Team Coordinator**: Orchestrates cross-agent collaboration for complex itineraries
 
-### 💬 **Conversational Intelligence**
+###  **Conversational Intelligence**
 - **Contextual Memory**: Maintains full conversation history across sessions
 - **Natural Language Processing**: Understands complex, multi-part travel requests
 - **Thread Persistence**: Seamless conversation continuity with client-side thread management
 
 
-### 🔧 **Developer-Friendly Design**
+###  **Developer-Friendly Design**
 - **Modular Architecture**: Easy to extend with new agents and capabilities
 - **RESTful API**: Clean endpoints for seamless integration
 - **LangGraph Framework**: State-of-the-art agent orchestration and workflow management
 
 ---
 
-## 🛠️ Technology Stack
+##  Technology Stack
 
 ### Backend Infrastructure
 - **Framework**: FastAPI (high-performance async Python web framework)
@@ -59,7 +59,7 @@ Our sophisticated multi-agent architecture employs specialized AI agents, each m
 
 ---
 
-## 🚀 Quick Start
+##  Quick Start
 
 ### Prerequisites
 - Python 3.8 or higher
@@ -118,7 +118,7 @@ NEXT_PUBLIC_BACKEND_URL=http://127.0.0.1:8000
  
 ---
 
-## 📚 API Documentation
+##  API Documentation
 
 ### Core Endpoints
 
@@ -150,7 +150,7 @@ NEXT_PUBLIC_BACKEND_URL=http://127.0.0.1:8000
 ```
 
 
-## 🎯 Future Roadmap
+##  Future Roadmap
 
 ### Short-term Goals 
 - [ ] **Car Rental Agent Integration**
@@ -191,7 +191,7 @@ NEXT_PUBLIC_BACKEND_URL=http://127.0.0.1:8000
 
 ---
 
-## 🤝 Contributing
+##  Contributing
 
 We welcome contributions from the community! TravelMate AI thrives on collaborative development and diverse perspectives.
 
@@ -220,11 +220,11 @@ We welcome contributions from the community! TravelMate AI thrives on collaborat
 
 --- 
 
-## 📞 Support & Community
+##  Support & Community
 
 ### Getting Help
-- 🐛 **Issues**: Report bugs via [GitHub Issues](https://github.com/aymen-000/travel-agent/issues)
-- 💬 **Discussions**: Join our [GitHub Discussions](https://github.com/aymen-000/travel-agent/discussions)
+-  **Issues**: Report bugs via [GitHub Issues](https://github.com/aymen-000/travel-agent/issues)
+-  **Discussions**: Join our [GitHub Discussions](https://github.com/aymen-000/travel-agent/discussions)
 
 
 ### Community Guidelines
@@ -232,7 +232,7 @@ We foster an inclusive, respectful environment where everyone can contribute mea
 
 ---
 
-## 👨‍💻 About the Creator
+##  About the Creator
 
 **Made with ❤️ by Aimen**
 
@@ -241,13 +241,13 @@ TravelMate AI represents a passion project combining artificial intelligence, tr
 *"Travel opens minds, and AI makes it accessible to everyone."* - Aimen
 
 ### Connect with Aimen
-- 🐙 GitHub: [@aymen-000](https://github.com/aymen-000)
-- 💼 LinkedIn: [Profile]([https://linkedin.com/in/aimen-profile](https://www.linkedin.com/in/boukhari-aimen-5a64b9284/)
+-  GitHub: [@aymen-000](https://github.com/aymen-000)
+-  LinkedIn: [Profile]([https://linkedin.com/in/aimen-profile](https://www.linkedin.com/in/boukhari-aimen-5a64b9284/)
 
 
 ---
 
-## 📜 License
+##  License
 
 This project is licensed under the **MIT License**.
 
